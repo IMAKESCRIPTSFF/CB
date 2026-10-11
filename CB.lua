@@ -242,7 +242,7 @@ task.spawn(function()
                 end)
             end
 
-            for _ = 1, PLAYTIME_INTERVAL * 10 do
+            for _ = 1, PLAYTIME_INTERVAL * 1 do
                 if unloaded or not playtimeEnabled then
                     break
                 end
