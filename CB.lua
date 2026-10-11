@@ -170,7 +170,7 @@ task.spawn(function()
     while gui.Parent do
         if hatchEnabled then
             local ok, err = pcall(function()
-                hatchRemote:InvokeServer("Cloud Egg", 6)
+                hatchRemote:InvokeServer("Cloud Egg", 10)
             end)
 
             if not ok then
