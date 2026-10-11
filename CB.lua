@@ -223,11 +223,10 @@ task.spawn(function()
     end
 end)
 
--- Auto Claim Playtime
+-- Auto Claim Playtime: send each gift ID twice
 playtimeButton.MouseButton1Click:Connect(function()
     playtimeEnabled = not playtimeEnabled
     updateButton(playtimeButton, "Auto Claim Playtime", playtimeEnabled)
-    print("[Playtime] Enabled:", playtimeEnabled)
 end)
 
 task.spawn(function()
@@ -238,16 +237,26 @@ task.spawn(function()
                     break
                 end
 
-                local success, err = pcall(function()
-                    local args = {rewardId}
-                    playtimeRemote:FireServer(unpack(args))
-                end)
+                for attempt = 1, 2 do
+                    if unloaded or not playtimeEnabled then
+                        break
+                    end
 
-                if not success then
-                    warn("[Playtime] Gift " .. rewardId .. " error: " .. tostring(err))
+                    local success, err = pcall(function()
+                        playtimeRemote:FireServer(rewardId)
+                    end)
+
+                    if not success then
+                        warn(
+                            "[Playtime] Gift "
+                            .. rewardId
+                            .. " error: "
+                            .. tostring(err)
+                        )
+                    end
+
+                    task.wait(0.1)
                 end
-
-                task.wait(0.2)
             end
 
             if playtimeEnabled and not unloaded then
@@ -351,7 +360,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Close and stop loops
+-- Close GUI and stop all loops
 closeButton.MouseButton1Click:Connect(function()
     unloaded = false
     hatchEnabled = false
