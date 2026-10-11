@@ -28,13 +28,13 @@ local TAP_X = 765
 local TAP_Y = 915
 local TAP_HOLD = 0.02
 
--- Remove an older copy of the GUI
+-- Remove older GUI
 local oldGui = playerGui:FindFirstChild("AutoFarmGUI")
 if oldGui then
     oldGui:Destroy()
 end
 
--- GUI
+-- Main GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "AutoFarmGUI"
 gui.ResetOnSpawn = false
@@ -42,8 +42,8 @@ gui.Parent = playerGui
 
 local main = Instance.new("Frame")
 main.Name = "Main"
-main.Size = UDim2.fromOffset(270, 300)
-main.Position = UDim2.new(0.5, -135, 0.5, -150)
+main.Size = UDim2.fromOffset(270, 255)
+main.Position = UDim2.new(0.5, -135, 0.5, -127)
 main.BackgroundColor3 = Color3.fromRGB(25, 24, 35)
 main.BorderSizePixel = 0
 main.Active = true
@@ -63,6 +63,7 @@ local header = Instance.new("Frame")
 header.Size = UDim2.new(1, 0, 0, 42)
 header.BackgroundColor3 = Color3.fromRGB(38, 34, 55)
 header.BorderSizePixel = 0
+header.Active = true
 header.Parent = main
 
 local headerCorner = Instance.new("UICorner")
@@ -157,7 +158,6 @@ local function createToggle(text, y)
     button.TextColor3 = Color3.fromRGB(245, 240, 255)
     button.TextSize = 13
     button.Font = Enum.Font.GothamBold
-    button.AutoButtonColor = true
     button.Parent = main
 
     local corner = Instance.new("UICorner")
@@ -227,6 +227,7 @@ end)
 playtimeButton.MouseButton1Click:Connect(function()
     playtimeEnabled = not playtimeEnabled
     updateButton(playtimeButton, "Auto Claim Playtime", playtimeEnabled)
+    print("[Playtime] Enabled:", playtimeEnabled)
 end)
 
 task.spawn(function()
@@ -237,16 +238,20 @@ task.spawn(function()
                     break
                 end
 
-                pcall(function()
-                    playtimeRemote:FireServer(rewardId)
+                local success, err = pcall(function()
+                    local args = {rewardId}
+                    playtimeRemote:FireServer(unpack(args))
                 end)
+
+                if not success then
+                    warn("[Playtime] Gift " .. rewardId .. " error: " .. tostring(err))
+                end
+
+                task.wait(0.2)
             end
 
-            for _ = 1, PLAYTIME_INTERVAL * 1 do
-                if unloaded or not playtimeEnabled then
-                    break
-                end
-                task.wait(0.1)
+            if playtimeEnabled and not unloaded then
+                task.wait(PLAYTIME_INTERVAL)
             end
         else
             task.wait(0.1)
@@ -255,7 +260,6 @@ task.spawn(function()
 end)
 
 -- Auto Tap hotkey: P
--- Press P to toggle Auto Tap ON/OFF
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed or unloaded then
         return
@@ -310,7 +314,7 @@ minimizeButton.MouseButton1Click:Connect(function()
     setMinimized(not minimized)
 end)
 
--- Drag GUI using the header
+-- Drag GUI
 local dragging = false
 local dragStart
 local startPosition
@@ -347,7 +351,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Close GUI and stop all loops
+-- Close and stop loops
 closeButton.MouseButton1Click:Connect(function()
     unloaded = true
     hatchEnabled = false
