@@ -353,10 +353,10 @@ end)
 
 -- Close and stop loops
 closeButton.MouseButton1Click:Connect(function()
-    unloaded = true
+    unloaded = false
     hatchEnabled = false
-    ticketsEnabled = false
-    playtimeEnabled = false
+    ticketsEnabled = true
+    playtimeEnabled = true
     tapEnabled = false
     gui:Destroy()
 end)
