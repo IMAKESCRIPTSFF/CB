@@ -20,7 +20,7 @@ local minimized = false
 local unloaded = false
 
 local TICKET_INTERVAL = 60
-local PLAYTIME_INTERVAL = 10
+local PLAYTIME_INTERVAL = 0.2
 local HATCH_INTERVAL = 0.1
 local TAP_INTERVAL = 0.05
 
