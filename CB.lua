@@ -170,7 +170,7 @@ end
 local hatchButton = createToggle("Auto Hatch", 83)
 local ticketsButton = createToggle("Auto Claim Tickets", 125)
 local playtimeButton = createToggle("Auto Claim Playtime", 167)
-local tapButton = createToggle("Auto Tap", 209)
+local tapButton = createToggle("Auto Tap (P)", 209)
 
 local function updateButton(button, name, enabled)
     button.Text = name .. (enabled and ": ON" or ": OFF")
@@ -188,12 +188,9 @@ end)
 task.spawn(function()
     while not unloaded do
         if hatchEnabled then
-            local amount = eggAmount
-
             pcall(function()
-                hatchRemote:InvokeServer("Cloud Egg", amount)
+                hatchRemote:InvokeServer("Cloud Egg", eggAmount)
             end)
-
             task.wait(HATCH_INTERVAL)
         else
             task.wait(0.1)
@@ -226,7 +223,7 @@ task.spawn(function()
     end
 end)
 
--- Auto Claim Playtime: claim IDs 1 through 9 every 10 seconds
+-- Auto Claim Playtime
 playtimeButton.MouseButton1Click:Connect(function()
     playtimeEnabled = not playtimeEnabled
     updateButton(playtimeButton, "Auto Claim Playtime", playtimeEnabled)
@@ -257,12 +254,20 @@ task.spawn(function()
     end
 end)
 
--- Auto Tap
-tapButton.MouseButton1Click:Connect(function()
-    tapEnabled = not tapEnabled
-    updateButton(tapButton, "Auto Tap", tapEnabled)
+-- Auto Tap hotkey: P
+-- Press P to toggle Auto Tap ON/OFF
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed or unloaded then
+        return
+    end
+
+    if input.KeyCode == Enum.KeyCode.P then
+        tapEnabled = not tapEnabled
+        updateButton(tapButton, "Auto Tap (P)", tapEnabled)
+    end
 end)
 
+-- Auto Tap loop
 task.spawn(function()
     while not unloaded do
         if tapEnabled then
@@ -342,7 +347,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Close and stop all loops
+-- Close GUI and stop all loops
 closeButton.MouseButton1Click:Connect(function()
     unloaded = true
     hatchEnabled = false
