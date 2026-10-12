@@ -364,8 +364,8 @@ end)
 closeButton.MouseButton1Click:Connect(function()
     unloaded = false
     hatchEnabled = false
-    ticketsEnabled = true
-    playtimeEnabled = true
+    ticketsEnabled = false
+    playtimeEnabled = false
     tapEnabled = false
     gui:Destroy()
 end)
